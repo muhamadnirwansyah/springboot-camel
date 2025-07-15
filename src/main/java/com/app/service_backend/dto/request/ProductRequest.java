@@ -18,6 +18,7 @@ public class ProductRequest {
 
     private String name;
     private String description;
+    private String fileBase64;
     private String activeDate;
     private String expireDate;
 
@@ -37,6 +38,11 @@ public class ProductRequest {
         }
         if (Objects.isNull(expireDate) || expireDate.trim().isEmpty()){
             errors.add("Expire date or end active date cannot be empty !");
+        }
+        if (!Objects.isNull(fileBase64) && !fileBase64.trim().isEmpty()){
+            if (!fileBase64.contains(",")){
+                errors.add("Format file base64 invalid !");
+            }
         }
         return errors;
     }
