@@ -2,12 +2,19 @@ package com.app.service_backend.service;
 
 import com.app.service_backend.constant.RedisConstant;
 import com.app.service_backend.dto.response.*;
+import com.app.service_backend.entity.City;
+import com.app.service_backend.entity.Province;
+import com.app.service_backend.entity.SubDistrict;
 import com.app.service_backend.repository.CityRepository;
 import com.app.service_backend.repository.ProvinceRepository;
 import com.app.service_backend.repository.SubDistrictRepository;
 import com.app.service_backend.repository.VillageRepository;
+import com.app.service_backend.util.GenericSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -110,5 +117,64 @@ public class IndonesianRegionService {
         });
         redisService.set(RedisConstant.VILLAGE_CACHE_KEY, villageResponses);
         return villageResponses;
+    }
+
+    public PageableResponse searchProvince(PageableRequest request){
+        log.info("search provinces : {}",request.getTextSearch());
+        Specification<Province> provinceSpecification = GenericSpecification.searchByKeyword(request.getTextSearch(), "name", "altName");
+        Page<ProvinceResponse> provinceResponses = provinceRepository
+                .findAll(provinceSpecification, PageRequest.of(request.getPage(), request.getSize()))
+                .map(this::toProvinceResponse);
+        return new PageableResponse(provinceResponses);
+    }
+
+    public PageableResponse searchCity(PageableRequest request){
+        log.info("search cities : {}",request.getTextSearch());
+        Specification<City> citySpecification = GenericSpecification.searchByKeyword(request.getTextSearch(), "name", "altName");
+        Page<CityResponse> cityResponses = cityRepository
+                .findAll(citySpecification, PageRequest.of(request.getPage(), request.getSize()))
+                .map(this::toCityResponse);
+        return new PageableResponse(cityResponses);
+    }
+
+    public PageableResponse searchDistrict(PageableRequest request){
+        log.info("search districts : {}",request.getTextSearch());
+        Specification<SubDistrict> subDistrictSpec = GenericSpecification.searchByKeyword(request.getTextSearch());
+        Page<SubDistrictResponse> districtResponses = subDistrictRepository.findAll(subDistrictSpec,
+                PageRequest.of(request.getPage(), request.getSize()))
+                .map(this::toSubDistrictResponse);
+        return new PageableResponse(districtResponses);
+    }
+
+    private SubDistrictResponse toSubDistrictResponse(SubDistrict subDistrict){
+        return SubDistrictResponse.builder()
+                .id(subDistrict.getId())
+                .name(subDistrict.getName())
+                .altName(subDistrict.getAltName())
+                .cityId(subDistrict.getCityId())
+                .latitude(subDistrict.getLatitude())
+                .longitude(subDistrict.getLongitude())
+                .build();
+    }
+
+    private CityResponse toCityResponse(City city){
+        return CityResponse.builder()
+                .id(city.getId())
+                .name(city.getName())
+                .provinceId(city.getProvinceId())
+                .altName(city.getAltName())
+                .latitude(city.getLatitude())
+                .longitude(city.getLongitude())
+                .build();
+    }
+
+    private ProvinceResponse toProvinceResponse(Province province){
+        return ProvinceResponse.builder()
+                .id(province.getId())
+                .name(province.getName())
+                .altName(province.getAltName())
+                .latitude(province.getLatitude())
+                .longitude(province.getLongitude())
+                .build();
     }
 }

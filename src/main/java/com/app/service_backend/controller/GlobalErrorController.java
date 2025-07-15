@@ -1,6 +1,7 @@
 package com.app.service_backend.controller;
 
 import com.app.service_backend.dto.response.ApiResponse;
+import com.app.service_backend.exception.ValidationMessageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,5 +22,15 @@ public class GlobalErrorController {
         ex.getBindingResult().getFieldErrors().forEach(messageError -> messageErrors.add(messageError.getDefaultMessage()));
         return ResponseEntity.status(ex.getStatusCode().value())
                 .body(ApiResponse.isFailed(ex.getStatusCode().value(), messageErrors, null, null));
+    }
+
+    @ExceptionHandler(ValidationMessageException.class)
+    public ResponseEntity<ApiResponse> handleValidationMessageException(ValidationMessageException exception){
+        log.error(exception.getMessage());
+        return ResponseEntity.status(exception.getStatus())
+                .body(ApiResponse.isFailed(
+                        exception.getStatus(),
+                        exception.getMessages(),
+                        null, null));
     }
 }

@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class PageableRequest extends SessionUserInfoRequest {
 
     private int page = 0;
-    private int size = 100;
+    private int size = 10;
     private String sort = "id";
     private String order = "desc";
     private String startDate = "";

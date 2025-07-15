@@ -1,6 +1,7 @@
 package com.app.service_backend.controller;
 
 import com.app.service_backend.dto.response.ApiResponse;
+import com.app.service_backend.dto.response.PageableRequest;
 import com.app.service_backend.service.IndonesianRegionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +66,30 @@ public class IndonesianRegionController extends BaseController{
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.isOk(indonesianRegionService.getAllVillages(districtId),
+                        checkAcceptLanguage(httpServletRequest), null, null));
+    }
+
+    @GetMapping(value = "/province/v1.0/search")
+    public ResponseEntity<ApiResponse> searchProvince(PageableRequest request,
+                                                      HttpServletRequest httpServletRequest){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.isOk(indonesianRegionService.searchProvince(request).getPage(),
+                        checkAcceptLanguage(httpServletRequest), null, null));
+    }
+
+    @GetMapping(value = "/city/v1.0/search")
+    public ResponseEntity<ApiResponse> searchCity(PageableRequest request,
+                                                  HttpServletRequest httpServletRequest){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.isOk(indonesianRegionService.searchCity(request).getPage(),
+                        checkAcceptLanguage(httpServletRequest), null, null));
+    }
+
+    @GetMapping(value = "/subdistrict/v1.0/search")
+    public ResponseEntity<ApiResponse> searchDistrict(PageableRequest request,
+                                                      HttpServletRequest httpServletRequest){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.isOk(indonesianRegionService.searchCity(request).getPage(),
                         checkAcceptLanguage(httpServletRequest), null, null));
     }
 }
